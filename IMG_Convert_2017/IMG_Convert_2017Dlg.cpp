@@ -172,10 +172,15 @@ void CIMGConvert2017Dlg::OnBnClickedImgMatLoad()
 		std::string strPath(pszString);
 		bflag = ((CButton*)GetDlgItem(IDC_GRAY_USE))->GetCheck();
 
+		Mat matImage;
+
 		if (bflag == FALSE)
-			m_matImage = imread(strPath, IMREAD_UNCHANGED);
+			matImage = imread(strPath, IMREAD_UNCHANGED);
 		else if (bflag == TRUE)
-			m_matImage = imread(strPath, IMREAD_GRAYSCALE);
+			matImage = imread(strPath, IMREAD_GRAYSCALE);
+
+		
+		resize(matImage, m_matImage, Size(matImage.cols - matImage.cols % 4, matImage.rows - matImage.rows % 4));
 
 		//2번 Row 참고(바로 아래)
 		CreateBitmapInfo(m_matImage.cols, m_matImage.rows, m_matImage.channels() * 8);
@@ -220,6 +225,7 @@ void CIMGConvert2017Dlg::CreateBitmapInfo(int w, int h, int bpp)
 
 	m_pBitmapInfo->bmiHeader.biWidth = w;
 	m_pBitmapInfo->bmiHeader.biHeight = -h;
+	
 }
 
 void CIMGConvert2017Dlg::DrawImage()
@@ -228,6 +234,26 @@ void CIMGConvert2017Dlg::DrawImage()
 
 	CRect rect;
 	GetDlgItem(IDC_PIC_IMG)->GetClientRect(&rect);
+	
+	// 영상 비율 계산 및 반영
+	float fImageRatio = float(m_matImage.cols) / float(m_matImage.rows);
+	float fRectRatio = float(rect.right) / float(rect.bottom);
+	float fScaleFactor;
+	if (fImageRatio < fRectRatio) {
+		fScaleFactor = float(rect.bottom) / float(m_matImage.rows); //TRACE("%f",fScaleFactor);
+		int rightWithRatio = m_matImage.cols * fScaleFactor;
+		float halfOfDif = ((float)rect.right - (float)rightWithRatio) / (float)2;
+		rect.left = halfOfDif;
+		rect.right = rightWithRatio;
+	}
+	else {
+		fScaleFactor = float(rect.right) / float(m_matImage.cols); //TRACE("%f",fScaleFactor);
+		int bottomWithRatio = m_matImage.rows * fScaleFactor;
+		float halfOfDif = ((float)rect.bottom - (float)bottomWithRatio) / (float)2;
+		rect.top = halfOfDif;
+		rect.bottom = bottomWithRatio;
+	}
+	
 
 	SetStretchBltMode(dc.GetSafeHdc(), COLORONCOLOR);
 
