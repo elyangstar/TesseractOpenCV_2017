@@ -236,24 +236,24 @@ void CIMGConvert2017Dlg::DrawImage()
 	GetDlgItem(IDC_PIC_IMG)->GetClientRect(&rect);
 	
 	// 영상 비율 계산 및 반영
-	float fImageRatio = float(m_matImage.cols) / float(m_matImage.rows);
-	float fRectRatio = float(rect.right) / float(rect.bottom);
-	float fScaleFactor;
-	if (fImageRatio < fRectRatio) {
-		fScaleFactor = float(rect.bottom) / float(m_matImage.rows); //TRACE("%f",fScaleFactor);
-		int rightWithRatio = m_matImage.cols * fScaleFactor;
-		float halfOfDif = ((float)rect.right - (float)rightWithRatio) / (float)2;
-		rect.left = halfOfDif;
-		rect.right = rightWithRatio;
-	}
-	else {
-		fScaleFactor = float(rect.right) / float(m_matImage.cols); //TRACE("%f",fScaleFactor);
-		int bottomWithRatio = m_matImage.rows * fScaleFactor;
-		float halfOfDif = ((float)rect.bottom - (float)bottomWithRatio) / (float)2;
-		rect.top = halfOfDif;
-		rect.bottom = bottomWithRatio;
-	}
-	
+// 	float fImageRatio = float(m_matImage.cols) / float(m_matImage.rows);
+// 	float fRectRatio = float(rect.right) / float(rect.bottom);
+// 	float fScaleFactor;
+// 	if (fImageRatio < fRectRatio) {
+// 		fScaleFactor = float(rect.bottom) / float(m_matImage.rows); //TRACE("%f",fScaleFactor);
+// 		int rightWithRatio = m_matImage.cols * fScaleFactor;
+// 		float halfOfDif = ((float)rect.right - (float)rightWithRatio) / (float)2;
+// 		rect.left = halfOfDif;
+// 		rect.right = rightWithRatio;
+// 	}
+// 	else {
+// 		fScaleFactor = float(rect.right) / float(m_matImage.cols); //TRACE("%f",fScaleFactor);
+// 		int bottomWithRatio = m_matImage.rows * fScaleFactor;
+// 		float halfOfDif = ((float)rect.bottom - (float)bottomWithRatio) / (float)2;
+// 		rect.top = halfOfDif;
+// 		rect.bottom = bottomWithRatio;
+// 	}
+// 	
 
 	SetStretchBltMode(dc.GetSafeHdc(), COLORONCOLOR);
 
@@ -303,7 +303,26 @@ void CIMGConvert2017Dlg::OnBnClickedLoadVideo2()
 	CString strOut = "";
 	translator.Translate(m_matImage, strOut);
 
+	SaveTxtFile(strOut);
+
 	AfxMessageBox(strOut);
+}
+
+void CIMGConvert2017Dlg::SaveTxtFile(CString strData)
+{
+	CString strGlassidTxtPath = "D:\\convert.txt";
+
+	FILE* pf = fopen(strGlassidTxtPath, "a");
+	if (pf)
+	{	
+		char buffer[2048] = {};
+		strcpy(buffer, strData);
+		fputs(buffer, pf);
+// 		{
+// 			
+// 		}
+		fclose(pf);
+	}
 }
 
 char* CIMGConvert2017Dlg::UTF8ToANSI(const char *pszCode)

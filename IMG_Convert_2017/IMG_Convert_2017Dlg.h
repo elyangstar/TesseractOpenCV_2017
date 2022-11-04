@@ -45,6 +45,7 @@ public:
 	afx_msg void OnBnClickedLoadVideo();
 	afx_msg void OnBnClickedLoadVideo2();
 
+	void SaveTxtFile(CString strData);
 	char* UTF8ToANSI(const char *pszCode);
 	CTranslator translator;
 };
